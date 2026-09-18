@@ -1,0 +1,16 @@
+{application, yammr, [
+    {description, "Yet Another Multiplexing Model Relay"},
+    {vsn, "0.9.0"},
+    {registered, []},
+    {mod, {yammr_app, []}},
+    {applications, [
+        kernel,
+        stdlib,
+		cowboy,
+		gun
+    ]},
+    {env, []},
+    {modules, []},
+    {licenses, ["AGPL"]},
+    {links, []}
+ ]}.

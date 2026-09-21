@@ -93,7 +93,7 @@ relay(ConnPid, Req0) ->
 
 % send the data to the summarizer to count tokens
 info({gun_data, _ConnPid, _MRef, IsFin, Msg}, Req, State) ->
-	%logger:notice("Relaying SSE message: ~p", [Msg]),
+    %logger:notice("Relaying SSE message: ~p", [Msg]),
     cowboy_req:stream_body(Msg, IsFin, Req),
     case IsFin of
         fin ->

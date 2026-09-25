@@ -46,7 +46,11 @@ init([ClientIssuer]) ->
         #{
             id => yammr_auth_ets,
             start => {yammr_auth_ets, start_link, []}
-        }
+        },
+		#{ 
+		  	id => yammr_config,
+			start => {yammr_config, start_link, []}
+		 }
     ],
     {ok, {SupFlags, ChildSpecs}}.
 

@@ -18,7 +18,7 @@ login(Req0, Opts) ->
     Nonce = yammr_util:rand_token(),
     PkceVerifier = yammr_util:rand_token(),
 
-	{ok, HandshakeId} = yammr_auth_ets:store(#{
+    {ok, HandshakeId} = yammr_auth_ets:store(#{
         state => State,
         nonce => Nonce,
         pkce_verifier => PkceVerifier
@@ -50,11 +50,11 @@ callback(Req0, Opts) ->
         client_secret := ClientSecret,
         client_redirect_uri := ClientRedirectUri
     } = Opts,
-	HandshakeId = 
-		case lists:keyfind(<<"yammr_auth">>, 1, cowboy_req:parse_cookies(Req0)) of
-			{_, V} -> V;
-			false -> undefined
-		end,
+    HandshakeId =
+        case lists:keyfind(<<"yammr_auth">>, 1, cowboy_req:parse_cookies(Req0)) of
+            {_, V} -> V;
+            false -> undefined
+        end,
     maybe
         % Grab the state from the ETS store
         {ok, Map} ?= yammr_auth_ets:take(HandshakeId),
@@ -84,10 +84,11 @@ callback(Req0, Opts) ->
                     email => maps:get(<<"email">>, Claims, <<"?">>)
                 }),
                 Req0
-            ), Opts}
+            ),
+            Opts}
     else
         {error, does_not_exist} ->
-			logger:notice("Stashed state retrieval failed: requested entry does not exist in ETS"),
+            logger:notice("Stashed state retrieval failed: requested entry does not exist in ETS"),
             {ok, reply_bad_request("No handshake saved server-side", Req0), Opts};
         {error, OtherError} ->
             logger:notice("Token exchange failed: ~p", [OtherError]),
@@ -98,8 +99,8 @@ callback(Req0, Opts) ->
         #{<<"state">> := BadState} ->
             logger:notice("State did not match: ~p)", [BadState]),
             {ok, reply_bad_request("Expected state did not match", Req0), Opts};
-		Err -> 
-			logger:notice("Missing some other state/code: ~p", [Err]),
+        Err ->
+            logger:notice("Missing some other state/code: ~p", [Err]),
             {ok, reply_bad_request("Missing some other state", Req0), Opts}
     end.
 

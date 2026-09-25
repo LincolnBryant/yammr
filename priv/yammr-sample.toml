@@ -1,0 +1,19 @@
+[server]
+port = 4434
+# redirect_uri is derived as base_url + "/yammr/auth/callback".
+base_url = "http://localhost:4434"
+
+[[upstreams]]
+name = "my upstream" # identifier
+host = "localhost"
+port = 11434
+api_token = "" 
+# OR 
+#api_token_file = "/etc/yammr/localhost.api_token"
+
+[oidc]
+issuer = "https://SOME_ORG_ID.okta.com/oauth2/default"
+client_id = "SOME_ID_STRING"
+client_secret = "SOME_SECRET_STRING" 
+# OR 
+#client_secret_file = "/etc/yammr/client_secret"

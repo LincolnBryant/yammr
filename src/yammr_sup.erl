@@ -13,8 +13,8 @@
 
 -define(SERVER, ?MODULE).
 
-start_link(ClientIssuer) ->
-    supervisor:start_link({local, ?SERVER}, ?MODULE, [ClientIssuer]).
+start_link(ConfigPath) ->
+    supervisor:start_link({local, ?SERVER}, ?MODULE, [ConfigPath]).
 
 %% sup_flags() = #{strategy => strategy(),         % optional
 %%                 intensity => non_neg_integer(), % optional
@@ -25,7 +25,7 @@ start_link(ClientIssuer) ->
 %%                  shutdown => shutdown(), % optional
 %%                  type => worker(),       % optional
 %%                  modules => modules()}   % optional
-init([ClientIssuer]) ->
+init([ConfigPath]) ->
     SupFlags = #{
         strategy => one_for_all,
         intensity => 0,
@@ -33,24 +33,18 @@ init([ClientIssuer]) ->
     },
     ChildSpecs = [
         #{
-            id => oidcc_provider_configuration_worker,
-            start =>
-                {oidcc_provider_configuration_worker, start_link, [
-                    #{
-                        issuer => ClientIssuer,
-                        name => {local, yammr_oidc_provider}
-                    }
-                ]},
-            shutdown => brutal_kill
-        },
-        #{
             id => yammr_auth_ets,
             start => {yammr_auth_ets, start_link, []}
         },
-		#{ 
-		  	id => yammr_config,
-			start => {yammr_config, start_link, []}
-		 }
+        #{
+            id => yammr_config,
+            start => {yammr_config, start_link, [ConfigPath]}
+        },
+        #{
+            id => yammr_oauth_sup,
+            start => {yammr_oauth_sup, start_link, []},
+			type => supervisor
+        }
     ],
     {ok, {SupFlags, ChildSpecs}}.
 

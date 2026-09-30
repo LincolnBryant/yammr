@@ -31,7 +31,7 @@ init([]) ->
         intensity => 0,
         period => 1
     },
-	{ok, IssuerBin} = yammr_config:get([oidc, issuer]),
+    {ok, IssuerBin} = yammr_config:get([oidc, issuer]),
     ChildSpecs = [
         #{
             id => oidcc_provider_configuration_worker,

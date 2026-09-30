@@ -33,8 +33,8 @@ init([ConfigPath]) ->
     },
     ChildSpecs = [
         #{
-            id => yammr_auth_ets,
-            start => {yammr_auth_ets, start_link, []}
+            id => yammr_auth_store,
+            start => {yammr_auth_store, start_link, []}
         },
         #{
             id => yammr_config,
@@ -43,7 +43,12 @@ init([ConfigPath]) ->
         #{
             id => yammr_oauth_sup,
             start => {yammr_oauth_sup, start_link, []},
-			type => supervisor
+            type => supervisor
+        },
+        %% API tokens minted from the dashboard (in-memory for now)
+        #{
+            id => yammr_tokens,
+            start => {yammr_tokens, start_link, []}
         }
     ],
     {ok, {SupFlags, ChildSpecs}}.

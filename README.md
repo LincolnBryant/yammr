@@ -1,3 +1,1 @@
-YAMMR
-Yet Another Metered Model Relay
-=====
+Yet Another Multiplexing Model Relay

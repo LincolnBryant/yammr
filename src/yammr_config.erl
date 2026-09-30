@@ -74,4 +74,4 @@ load_and_parse(ConfigPath) ->
 
 validate(Config) ->
     % TODO: Jesse stuff
-	{ok, Config}.
+    {ok, Config}.

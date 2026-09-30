@@ -7,11 +7,11 @@ start(_StartType, _StartArgs) ->
     ConfigPath = os:getenv("YAMMR_CONFIG_PATH", "/etc/yammr/config.toml"),
     yammr_sup:start_link(ConfigPath),
 
-	{ok, YammrPort} = yammr_config:get([server, port]),
+    {ok, YammrPort} = yammr_config:get([server, port]),
 
     % Configure
     % Compile the routes into a opaque dispatch rules
-    Dispatch = cowboy_router:compile([{'_', proxy_config() ++ oidc_config()}]),
+    Dispatch = cowboy_router:compile([{'_', proxy_config() ++ oidc_config() ++ yammr_ui:routes()}]),
     {ok, _Pid} = cowboy:start_clear(yammr_proxy, [{port, YammrPort}], #{
         env => #{dispatch => Dispatch}
     }).

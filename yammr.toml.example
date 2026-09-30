@@ -1,0 +1,15 @@
+[server]
+port = 4434
+
+[upstream]
+# Your SGLang, vLLM, Ollama, etc
+host = "127.0.0.1"
+port = 30000
+api_token = "<<token>>"
+
+[oidc]
+# can be any OIDC compatible issuer: Okta, Keycloak, Google..
+issuer = "https://<<INTEGRATION>>.okta.com/oauth2/default"
+client_redirect_uri = "http://<<THIS HOST'S PUBLIC IP>>:4434/yammr/auth/callback"
+client_id = "<<CLIENT ID FROM OIDC>>"
+client_secret = "<<CLIENT SECRET FROM OIDC>>"

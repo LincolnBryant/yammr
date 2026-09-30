@@ -1,9 +1,9 @@
--module(yammr_auth_ets).
+-module(yammr_auth_store).
 -behaviour(gen_server).
 
 %% API
 -export([start_link/0]).
--export([store/1, store/2, take/1, lookup/1, delete/1]).
+-export([put/1, put/2, take/1, lookup/1, delete/1]).
 
 %% gen_server callbacks
 -export([
@@ -22,13 +22,13 @@
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
--spec store(map()) -> {ok, binary()}.
-store(Map) ->
-    store(Map, ?TTL_MS).
+-spec put(map()) -> {ok, binary()}.
+put(Map) ->
+    put(Map, ?TTL_MS).
 
--spec store(map(), pos_integer()) -> {ok, binary()}.
-store(Map, TtlMs) ->
-    gen_server:call(?MODULE, {store, Map, TtlMs}).
+-spec put(map(), pos_integer()) -> {ok, binary()}.
+put(Map, TtlMs) ->
+    gen_server:call(?MODULE, {put, Map, TtlMs}).
 
 %% Read and remove (one-shot handshake state).
 -spec take(binary() | undefined) -> {ok, map()} | {error, does_not_exist | expired}.
@@ -49,7 +49,7 @@ init([]) ->
     erlang:send_after(?SWEEP_MS, self(), sweep),
     {ok, Table}.
 
-handle_call({store, Map, TtlMs}, _From, Table) ->
+handle_call({put, Map, TtlMs}, _From, Table) ->
     Id = yammr_util:rand_token(),
     Expiry = erlang:monotonic_time(millisecond) + TtlMs,
     true = ets:insert(Table, {Id, Map, Expiry}),

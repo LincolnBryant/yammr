@@ -1,0 +1,16 @@
+{# Connect card panel for Codex CLI. Included by connect.dtl; see harness/curl.dtl. #}
+<ol class="steps">
+  <li>Export your token as YAMMR_API_KEY.</li>
+  <li>Add the provider to ~/.codex/config.toml and make it the default.</li>
+</ol>
+<div class="codeblock">
+<pre><code>model_provider = "yammr"
+model = "{{ model }}"
+
+[model_providers.yammr]
+name = "yammr"
+base_url = "{{ base_url }}"
+env_key = "YAMMR_API_KEY"
+wire_api = "chat"</code></pre>
+  {% include "copy_button.dtl" %}
+</div>

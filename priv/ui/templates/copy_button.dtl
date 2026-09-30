@@ -1,0 +1,5 @@
+{# Copies the <pre> immediately before it. Include as the last child of a .codeblock. #}
+<button class="btn sm copy" type="button"
+        hx-on:click="navigator.clipboard.writeText(this.previousElementSibling.textContent); this.classList.add('done')">
+  <svg class="icon"><use href="#i-copy"/></svg><span class="copy-label">Copy</span>
+</button>

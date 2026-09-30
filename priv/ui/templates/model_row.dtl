@@ -1,0 +1,27 @@
+{# Fragment: one row of the models table. Looped from system.dtl, and returned
+   alone by POST /system/models/:model/warm to replace the row that asked. #}
+<tr>
+  <td>
+    <div class="model">
+      <span class="name">{{ m.name }}</span>
+      <code>{{ m.id }}</code>
+    </div>
+  </td>
+  <td class="muted">{{ m.kind }}</td>
+  <td class="r num">{{ m.context }}</td>
+  <td>
+    {% if m.status == "ready" %}<span class="badge ok">ready</span>
+    {% elif m.status == "warming" %}<span class="badge warn">warming</span>
+    {% else %}<span class="badge off">cold</span>{% endif %}
+  </td>
+  <td class="r">
+    {% if m.status == "cold" %}
+      <button class="btn sm" hx-post="/system/models/{{ m.id }}/warm" hx-target="closest tr" hx-swap="outerHTML" hx-disable="this">
+        <svg class="icon"><use href="#i-flame"/></svg>Warm up
+        <svg class="icon htmx-indicator spin"><use href="#i-loader"/></svg>
+      </button>
+    {% elif m.status == "warming" %}
+      <span class="small faint"><svg class="icon"><use href="#i-check"/></svg> requested</span>
+    {% endif %}
+  </td>
+</tr>

@@ -1,0 +1,21 @@
+{# Connect card panel for curl. Included by connect.dtl; the id is listed in
+   yammr_ui:harnesses/0. Snippet lines are flush-left: <pre> keeps whitespace. #}
+<ol class="steps">
+  <li>Mint an API token above and export it as YAMMR_API_KEY.</li>
+  <li>List models, then send a chat completion. Add "stream": true for SSE.</li>
+</ol>
+<div class="codeblock">
+<pre><code>export YAMMR_API_KEY="<mark>yk_...</mark>"
+
+curl {{ base_url }}/models \
+  -H "Authorization: Bearer $YAMMR_API_KEY"
+
+curl {{ base_url }}/chat/completions \
+  -H "Authorization: Bearer $YAMMR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "{{ model }}",
+    "messages": [{"role": "user", "content": "ping"}]
+  }'</code></pre>
+  {% include "copy_button.dtl" %}
+</div>

@@ -1,0 +1,326 @@
+/* yammr dashboard — one hand-written stylesheet, no framework, no build step.
+   Order: tokens → base → app shell → components → login → responsive. */
+
+:root {
+  /* MIT brand palette (brand.mit.edu/color). Each token is light-dark(light, dark); which side
+     applies is decided by `color-scheme` below: the OS preference by default, or the user's
+     choice via data-theme (set by theme.js). Every text/background pair is >= 4.5:1.
+     Light: core palette. MIT Red accent on white cards, Yellow highlight (the guide pairs MIT Red
+     with analogous warm colours). Bright Red and Green are < 4.5:1 on white, so in light mode they
+     are tints only, never text.
+     Dark: expanded palette, cool side. Light Purple for text accents and (inverted) fills,
+     Light Blue for focus and decoration; no reds. Surfaces are the gray ramp only: Dark Gray 2
+     canvas, cards a step lighter. Pure black is not used. Status colours are the brand Green /
+     Yellow knocked back toward Light Gray 1 so they don't glare; destructive stays a muted red. */
+  color-scheme: light dark;
+  --bg: light-dark(#f2f4f8, #212326);                 /* Light Gray 1 | Dark Gray 2 */
+  --surface: light-dark(#ffffff, color-mix(in srgb, #40464c 35%, #212326));      /* white | ~#2c2f33 */
+  --surface-2: light-dark(#f2f4f8, color-mix(in srgb, #40464c 75%, #212326));    /* Light Gray 1 | ~#383d42 */
+  --border: light-dark(#dde1e6, #626a73);             /* Light Gray 2 | Dark Silver Gray */
+  --border-strong: light-dark(#b8c2cc, #8b959e);      /* Light Silver Gray | Silver Gray */
+  --text: light-dark(#212326, #dde1e6);               /* Dark Gray 2 | Light Gray 2 */
+  --text-2: light-dark(#40464c, #b8c2cc);             /* Dark Gray 1 | Light Silver Gray */
+  --text-3: light-dark(#626a73, color-mix(in srgb, #b8c2cc 50%, #8b959e));      /* Dark Silver Gray | between the Silver Grays */
+  /* --accent is for text, icons and outlines; --accent-fill for solid backgrounds (primary button). */
+  --accent: light-dark(#750014, #bfb3ff);             /* MIT Red | Light Purple (7.1:1 on cards) */
+  /* Dark fills are the *light* purple with dark text (8.3:1): an inverted button reads calmer on a
+     dark canvas than a saturated Dark Purple slab. */
+  --accent-fill: light-dark(#750014, #bfb3ff);        /* MIT Red | Light Purple */
+  --on-accent: light-dark(#ffffff, #212326);          /* white | Dark Gray 2 */
+  --accent-2: light-dark(#ff1423, #99ebff);           /* decorative only (login gradient): Bright Red | Light Blue */
+  --accent-soft: light-dark(color-mix(in srgb, #750014 9%, #ffffff), color-mix(in srgb, #bfb3ff 16%, var(--surface)));
+  --focus: light-dark(#1966ff, #99ebff);              /* Blue | Light Blue */
+  /* Dark mode gets a second, non-interactive accent so the page has somewhere for the eye to land:
+     stat values and card icons. Light mode keeps a single accent (MIT Red) for both roles. */
+  --emphasis: light-dark(#750014, #99ebff);           /* MIT Red | Light Blue (10:1 on cards) */
+  --ok: light-dark(#004d1a, color-mix(in srgb, #00ad00 70%, #f2f4f8));       /* Dark Green | muted Green */
+  --ok-soft: light-dark(color-mix(in srgb, #00ad00 14%, #ffffff), color-mix(in srgb, #00ad00 14%, var(--surface)));
+  --warn: light-dark(#40464c, color-mix(in srgb, #ffeb00 60%, #f2f4f8));     /* Dark Gray 1 on a Yellow tint | muted Yellow */
+  --warn-soft: light-dark(color-mix(in srgb, #ffeb00 40%, #ffffff), color-mix(in srgb, #ffeb00 12%, var(--surface)));
+  --bad: light-dark(#750014, color-mix(in srgb, #ff1423 55%, #f2f4f8));      /* MIT Red | muted red, destructive actions only */
+  --bad-soft: light-dark(color-mix(in srgb, #ff1423 10%, #ffffff), color-mix(in srgb, #ff1423 16%, var(--surface)));
+  /* Terminal blocks follow the theme: a light terminal in light mode, a recessed one in dark. */
+  --code-bg: light-dark(#f2f4f8, #212326);            /* Light Gray 1 | Dark Gray 2 */
+  --code-fg: light-dark(#212326, #dde1e6);            /* Dark Gray 2 | Light Gray 2 (14:1 / 12:1) */
+  --code-border: light-dark(#dde1e6, transparent);    /* Light Gray 2 | none (the recess is enough) */
+  /* "Replace me" marks in snippets. Light: the same pale Bright Red tint as the danger button with
+     MIT Red text (~9:1). Dark: Light Blue with Dark Gray 2 text (10:1) — the same emphasis colour as
+     the stat numbers and card icons, so dark stays at two accents. */
+  --highlight-bg: light-dark(color-mix(in srgb, #ff1423 18%, #ffffff), #99ebff);
+  --highlight-fg: light-dark(#750014, #212326);
+  --shadow-1: light-dark(rgba(33, 35, 38, 0.04), rgba(33, 35, 38, 0.4));
+  --shadow-2: light-dark(rgba(33, 35, 38, 0.18), rgba(33, 35, 38, 0.7));
+  --shadow: 0 1px 2px var(--shadow-1), 0 8px 24px -16px var(--shadow-2);
+  --sidebar-w: 240px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  /* Vendored in /ui/fonts/ (fonts.css); system fallbacks only if those fail to load. */
+  --font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Roboto Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+/* Explicit choice overrides the OS. No data-theme = follow the OS. */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+html {
+  font-family: var(--font); font-size: 14px; line-height: 1.45;
+  color: var(--text); background: var(--bg);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+body { margin: 0; min-height: 100dvh; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.015em; }
+h1 { font-size: 22px; }
+h2 { font-size: 15px; display: flex; align-items: center; gap: 8px; }
+h2 .icon { color: var(--emphasis); }
+p { margin: 0; }
+code, pre, .mono { font-family: var(--mono); font-size: 12.5px; }
+code { padding: 1px 5px; border-radius: 5px; background: var(--surface-2); border: 1px solid var(--border); }
+.num { font-variant-numeric: tabular-nums; }
+.muted { color: var(--text-2); }
+.faint { color: var(--text-3); }
+.small { font-size: 12px; }
+.dot { color: var(--text-3); padding: 0 4px; }
+
+/* Placeholders the reader must replace (their token). */
+mark {
+  background: var(--highlight-bg); color: var(--highlight-fg); border-radius: 3px; padding: 0 4px;
+  font-family: var(--mono); font-size: 12px; font-weight: 500;
+}
+
+.icon {
+  width: 16px; height: 16px; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+.sprite { display: none; }
+
+/* ---------- App shell ---------- */
+.app { display: grid; grid-template-columns: var(--sidebar-w) minmax(0, 1fr); min-height: 100dvh; }
+
+.sidebar {
+  position: sticky; top: 0; height: 100dvh;
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 18px 14px;
+  background: var(--surface); border-right: 1px solid var(--border);
+}
+
+/* Wordmark only for now; a designed mark will go in front of it later. */
+.brand { display: block; padding: 6px 10px 16px; color: inherit; }
+.brand:hover { text-decoration: none; }
+.brand .name { display: block; font-weight: 600; font-size: 17px; line-height: 1.1; letter-spacing: -0.01em; }
+.brand .sub { display: block; font-size: 10.5px; color: var(--text-3); margin-top: 4px; letter-spacing: 0.01em; }
+
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: var(--radius-sm);
+  color: var(--text-2); font-weight: 500;
+}
+.nav a:hover { background: var(--surface-2); color: var(--text); text-decoration: none; }
+.nav a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+.nav .icon { width: 15px; height: 15px; opacity: 0.9; }
+
+.sidebar-footer { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
+.sidebar-footer .user { display: flex; align-items: center; gap: 10px; padding: 6px 10px 8px; }
+.sidebar-footer .user .who { flex: 1; }
+.sidebar-footer .avatar { width: 30px; height: 30px; }
+.sidebar-footer .avatar .icon { width: 15px; height: 15px; }
+.sidebar-footer .meta { padding: 10px 10px 0; font-size: 11.5px; color: var(--text-2); }
+/* Theme switch. Shows the icon for the theme you'd switch *to*: moon in light, sun in dark. */
+.theme-toggle {
+  display: inline-grid; place-items: center; width: 28px; height: 28px; flex: none;
+  border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--surface); color: var(--text-2); cursor: pointer; padding: 0;
+}
+.theme-toggle:hover { background: var(--surface-2); color: var(--text); }
+.theme-toggle .icon { width: 14px; height: 14px; }
+.theme-toggle .i-sun { display: none; }
+:root[data-theme="dark"] .theme-toggle .i-sun { display: inline; }
+:root[data-theme="dark"] .theme-toggle .i-moon { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .theme-toggle .i-sun { display: inline; }
+  :root:not([data-theme]) .theme-toggle .i-moon { display: none; }
+}
+
+.main { padding: 30px 36px 56px; min-width: 0; max-width: 1180px; }
+.page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+.page-header p { margin-top: 4px; color: var(--text-2); }
+
+/* ---------- Cards & grid ---------- */
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px 20px; box-shadow: var(--shadow);
+}
+.card + .card, .grid + .card { margin-top: 16px; }
+/* Grid cells stretch, so cards in one row share a height; don't let the sibling margin offset them. */
+.grid > .card { margin-top: 0; }
+.card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; min-height: 24px; }
+.grid { display: grid; gap: 16px; }
+.grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+
+/* Stat card */
+.stat .card-header { margin-bottom: 8px; }
+.stat .card-header h2 { font-size: 13px; font-weight: 500; color: var(--text-2); }
+/* Light keeps the numbers in body colour (MIT Red digits would shout); dark gives them the Light Blue pop. */
+.stat .value { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; color: light-dark(var(--text), var(--emphasis)); }
+.stat .value .of { font-size: 15px; font-weight: 500; color: var(--text-3); margin-left: 6px; letter-spacing: 0; }
+.stat .delta { font-size: 12px; margin-top: 8px; color: var(--text-3); }
+
+/* Identity (account card, sidebar footer) */
+.identity { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent);
+}
+.avatar .icon { width: 15px; height: 15px; }
+.avatar.lg { width: 44px; height: 44px; }
+.avatar.lg .icon { width: 20px; height: 20px; }
+.who { min-width: 0; }
+.who .name { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.identity .who .name { font-size: 15px; }
+.who .email { font-size: 12px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Token card */
+.secret { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.secret code {
+  flex: 1; min-width: 0; padding: 8px 10px; word-break: break-all;
+  background: var(--surface-2); border-color: var(--border-strong);
+}
+.secret .mask { letter-spacing: 0.08em; color: var(--text-3); }
+.secret + .small { margin-top: 8px; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 7px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong);
+  background: var(--surface); color: var(--text); font: inherit; font-weight: 500; font-size: 13px;
+  cursor: pointer; white-space: nowrap; transition: background 120ms, border-color 120ms, opacity 120ms;
+}
+.btn:hover { background: var(--surface-2); text-decoration: none; }
+.btn:disabled { opacity: 0.6; cursor: default; }
+.btn .icon { width: 14px; height: 14px; }
+.btn.primary { background: var(--accent-fill); border-color: var(--accent-fill); color: var(--on-accent); }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.danger { color: var(--bad); border-color: transparent; background: var(--bad-soft); }
+.btn.danger:hover { filter: brightness(0.97); }
+.btn.sm { padding: 5px 9px; font-size: 12px; }
+.btn.block { width: 100%; padding: 10px; font-size: 14px; }
+
+/* Copy buttons flip to "Copied" purely via class toggle (see hx-on:click). */
+.btn.done .copy-label { display: none; }
+.btn.done::after { content: "Copied"; }
+.btn.done { color: var(--ok); }
+
+/* htmx request state: hide the spinner until a request is in flight. */
+.htmx-indicator { display: none; }
+.htmx-request .htmx-indicator, .htmx-request.htmx-indicator { display: inline-block; }
+.spin { animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- Badges ---------- */
+.badge {
+  display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 500; white-space: nowrap;
+}
+.badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.badge.ok { color: var(--ok); background: var(--ok-soft); }
+.badge.warn { color: var(--warn); background: var(--warn-soft); }
+.badge.warn::before { animation: pulse 1.2s ease-in-out infinite; }
+.badge.bad { color: var(--bad); background: var(--bad-soft); }
+.badge.off { color: var(--text-2); background: var(--surface-2); }
+@keyframes pulse { 50% { opacity: 0.25; } }
+
+/* ---------- Table ---------- */
+.table-wrap { overflow-x: auto; margin: 0 -20px -18px; padding: 0 20px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  text-align: left; font-weight: 500; font-size: 11px; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 10px; border-bottom: 1px solid var(--border);
+}
+td { padding: 11px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: 0; }
+td.r, th.r { text-align: right; }
+td .icon { width: 13px; height: 13px; vertical-align: -2px; }
+.model { display: flex; flex-direction: column; gap: 3px; }
+.model .name { font-weight: 550; }
+.model code { align-self: flex-start; font-size: 11.5px; }
+
+/* ---------- Tabs & code ---------- */
+.tabs { display: flex; flex-wrap: wrap; gap: 2px; box-shadow: inset 0 -1px var(--border); margin: 0 -4px 14px; }
+.tabs button {
+  padding: 8px 12px; border: 0; border-bottom: 2px solid transparent;
+  background: none; color: var(--text-2); font: inherit; font-weight: 500; font-size: 13px; cursor: pointer;
+}
+.tabs button:hover { color: var(--text); }
+.tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+
+.steps { margin: 0 0 14px; padding-left: 22px; color: var(--text-2); }
+.steps li { margin: 4px 0; }
+.steps li::marker { color: var(--accent); font-weight: 600; }
+
+.codeblock { position: relative; }
+.codeblock pre {
+  margin: 0; padding: 14px 16px; overflow-x: auto; border-radius: var(--radius-sm);
+  background: var(--code-bg); color: var(--code-fg); line-height: 1.55;
+  border: 1px solid var(--code-border);
+}
+.codeblock code { background: none; border: 0; padding: 0; color: inherit; font-size: 12.5px; }
+.codeblock mark { font-size: inherit; }
+/* The copy button is an ordinary .btn; it sits on the terminal, so it uses the card surface to lift off it. */
+.codeblock .copy { position: absolute; top: 8px; right: 8px; background: var(--surface); }
+.codeblock .copy.done { color: var(--accent); }
+.codeblock + .small { margin-top: 10px; }
+
+/* ---------- Login ---------- */
+.login-page {
+  background:
+    radial-gradient(900px 500px at 15% -10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%),
+    radial-gradient(700px 400px at 100% 100%, color-mix(in srgb, var(--accent-2) 12%, transparent), transparent 60%),
+    var(--bg);
+}
+.login { min-height: 100dvh; display: grid; place-items: center; padding: 24px; }
+.login .card { width: 100%; max-width: 400px; padding: 30px; position: relative; }
+.login .theme-toggle.corner { position: absolute; top: 16px; right: 16px; }
+.login .brand { padding: 0 0 20px; }
+.login h1 { font-size: 24px; margin-bottom: 6px; }
+.login .idp { margin-top: 24px; }
+.login .notice {
+  display: flex; align-items: center; gap: 8px; margin-top: 16px; padding: 10px 12px;
+  border-radius: var(--radius-sm); background: var(--warn-soft); color: var(--warn); font-size: 13px;
+}
+.login .foot { margin-top: 20px; text-align: center; font-size: 12px; color: var(--text-3); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px) {
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar {
+    position: static; height: auto; flex-direction: row; align-items: center; gap: 8px;
+    padding: 10px 14px; border-right: 0; border-bottom: 1px solid var(--border);
+  }
+  .brand { padding: 0; }
+  .brand .sub { display: none; }
+  .nav { flex-direction: row; margin-left: auto; }
+  /* Footer becomes an inline cluster: hide name/email/version, keep theme toggle + Log out. */
+  .sidebar-footer { margin-top: 0; padding-top: 0; border-top: 0; flex-direction: row; align-items: center; gap: 4px; }
+  .sidebar-footer .who, .sidebar-footer .avatar, .sidebar-footer .meta { display: none; }
+  .sidebar-footer .user { padding: 0; }
+  .sidebar-footer .nav { margin-left: 0; }
+  .sidebar-footer .nav a span { display: none; } /* icon-only Log out */
+  .sidebar-footer .nav a { padding: 6px 8px; }
+  .main { padding: 20px 16px 40px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  /* Card headers stack their right-hand note under the title on narrow screens. */
+  .card-header { flex-wrap: wrap; }
+  .card-header > .small { flex-basis: 100%; }
+  /* Copy button stops floating over the code and sits below the snippet instead. */
+  .codeblock .copy { position: static; margin-top: 8px; }
+}

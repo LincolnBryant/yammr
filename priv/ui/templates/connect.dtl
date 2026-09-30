@@ -1,0 +1,25 @@
+{# Fragment: the body of the Connect card, one harness at a time. Rendered by
+   GET /dashboard/connect/:harness and included in dashboard.dtl. The tablist
+   hoists target/swap so each tab button only needs its URL.
+
+   Each harness's steps and snippet live in harness/<id>.dtl. erlydtl includes
+   are static, so the panel picks one with an if-chain; the ids here, the tab
+   list in yammr_ui:harnesses/0 and the files under harness/ must agree. #}
+<div id="connect-body" hx-target:inherited="#connect-body" hx-swap:inherited="outerHTML">
+  <div class="tabs" role="tablist">
+    {% for t in tabs %}
+      <button role="tab" type="button" hx-get="/dashboard/connect/{{ t.id }}"
+              {% if t.id == harness %}aria-selected="true"{% else %}aria-selected="false"{% endif %}>{{ t.label }}</button>
+    {% endfor %}
+  </div>
+
+  <div class="panel" role="tabpanel">
+    {% if harness == "curl" %}{% include "harness/curl.dtl" %}
+    {% elif harness == "python" %}{% include "harness/python.dtl" %}
+    {% elif harness == "opencode" %}{% include "harness/opencode.dtl" %}
+    {% elif harness == "codex" %}{% include "harness/codex.dtl" %}
+    {% elif harness == "cursor" %}{% include "harness/cursor.dtl" %}
+    {% endif %}
+    <p class="small faint">Replace <mark>yk_...</mark> with the token you minted above. Model ids are listed on the <a href="/system">System</a> page, or <code>GET {{ base_url }}/models</code>.</p>
+  </div>
+</div>

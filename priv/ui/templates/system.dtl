@@ -1,0 +1,62 @@
+{% extends "layout.dtl" %}
+{% block title %}System{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>System</h1>
+    <p>What you've relayed, and which models are ready to take traffic.</p>
+  </div>
+</div>
+
+{# Usage: single stats, mocked until metering lands. #}
+<div class="grid grid-3">
+  <section class="card stat">
+    <div class="card-header">
+      <h2><svg class="icon"><use href="#i-activity"/></svg>Tokens relayed</h2>
+      <span class="badge off" title="Not yet wired to the relay">mock</span>
+    </div>
+    <div class="value num">{{ usage.tokens }}</div>
+    <div class="delta">{{ usage.period }} · attributed to your API token</div>
+  </section>
+  <section class="card stat">
+    <div class="card-header">
+      <h2><svg class="icon"><use href="#i-activity"/></svg>Requests</h2>
+      <span class="badge off" title="Not yet wired to the relay">mock</span>
+    </div>
+    <div class="value num">{{ usage.requests }}</div>
+    <div class="delta">{{ usage.period }}</div>
+  </section>
+  <section class="card stat">
+    <div class="card-header">
+      <h2><svg class="icon"><use href="#i-cpu"/></svg>Models ready</h2>
+      <span class="badge off" title="Not yet wired to the relay">mock</span>
+    </div>
+    <div class="value num">{{ usage.ready }}<span class="of">/ {{ usage.total }}</span></div>
+    <div class="delta">cold models can be warmed below</div>
+  </section>
+</div>
+
+{# Models, with a mocked warm-up request per cold row. #}
+<section id="models" class="card">
+  <div class="card-header">
+    <h2><svg class="icon"><use href="#i-cpu"/></svg>Models</h2>
+    <span class="small faint">Warm-up is mocked: the row updates, nothing is scheduled</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Type</th>
+          <th class="r">Context</th>
+          <th>Status</th>
+          <th class="r"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in models %}{% include "model_row.dtl" %}{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

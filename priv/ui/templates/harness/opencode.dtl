@@ -1,0 +1,19 @@
+{# Connect card panel for OpenCode. Included by connect.dtl; see harness/curl.dtl. #}
+<ol class="steps">
+  <li>Add a provider to opencode.json in your project or ~/.config/opencode/.</li>
+  <li>Run /connect, choose the yammr provider and paste your token.</li>
+</ol>
+<div class="codeblock">
+<pre><code>{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "yammr": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "yammr",
+      "options": { "baseURL": "{{ base_url }}" },
+      "models": { "{{ model }}": { "name": "Llama 3.3 70B" } }
+    }
+  }
+}</code></pre>
+  {% include "copy_button.dtl" %}
+</div>

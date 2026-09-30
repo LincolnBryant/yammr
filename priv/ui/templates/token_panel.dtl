@@ -1,0 +1,49 @@
+{# Fragment: the API token card. Rendered by yammr_ui for POST/DELETE /dashboard/token
+   and included in dashboard.dtl. Every button inside inherits the target/swap
+   declared on the root, so a response replaces the whole card. #}
+<section id="token" class="card" hx-target:inherited="#token" hx-swap:inherited="outerHTML">
+  <div class="card-header">
+    <h2><svg class="icon"><use href="#i-key"/></svg>API token</h2>
+    {# Quiet by default. Only speak up when the token needs the user's attention. #}
+    {# yammr_tokens doesn't set `stale` yet; when it does (expiry, upstream rotation), this appears. #}
+    {% if token.stale %}<span class="badge warn">needs refresh</span>{% endif %}
+  </div>
+
+  {% if secret %}
+    <p class="small"><strong>Copy it now.</strong> This is the only time the full token is shown.</p>
+    <div class="secret">
+      <code>{{ secret }}</code>
+      <button class="btn sm" type="button" data-copy="{{ secret }}"
+              hx-on:click="navigator.clipboard.writeText(this.dataset.copy); this.classList.add('done')">
+        <svg class="icon"><use href="#i-copy"/></svg><span class="copy-label">Copy</span>
+      </button>
+    </div>
+    <p class="small faint">Created {{ token.created }}</p>
+  {% elif token %}
+    <div class="secret">
+      <code>{{ token.prefix }}<span class="mask">••••••••••••••••••••</span></code>
+    </div>
+    <p class="small faint">Created {{ token.created }}. Send it as <code>Authorization: Bearer …</code> on <code>/v1</code> requests.</p>
+  {% else %}
+    <p class="muted">You don't have an API token yet. Mint one to start sending requests through the relay.</p>
+  {% endif %}
+
+  <div class="actions">
+    {% if secret or token %}
+      <button class="btn" hx-post="/dashboard/token" hx-disable="this"
+              hx-confirm="Replace the current token? Anything still using it will stop working.">
+        <svg class="icon"><use href="#i-refresh"/></svg>Regenerate
+        <svg class="icon htmx-indicator spin"><use href="#i-loader"/></svg>
+      </button>
+      <button class="btn danger" hx-delete="/dashboard/token" hx-disable="this"
+              hx-confirm="Revoke this token?">
+        <svg class="icon"><use href="#i-trash"/></svg>Revoke
+      </button>
+    {% else %}
+      <button class="btn primary" hx-post="/dashboard/token" hx-disable="this">
+        <svg class="icon"><use href="#i-key"/></svg>Mint API token
+        <svg class="icon htmx-indicator spin"><use href="#i-loader"/></svg>
+      </button>
+    {% endif %}
+  </div>
+</section>

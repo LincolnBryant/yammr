@@ -1,0 +1,16 @@
+{# Connect card panel for Python. Included by connect.dtl; see harness/curl.dtl. #}
+<ol class="steps">
+  <li>The official openai package works unchanged; only base_url changes.</li>
+</ol>
+<div class="codeblock">
+<pre><code>from openai import OpenAI
+
+client = OpenAI(base_url="{{ base_url }}", api_key="<mark>yk_...</mark>")
+
+resp = client.chat.completions.create(
+    model="{{ model }}",
+    messages=[{"role": "user", "content": "ping"}],
+)
+print(resp.choices[0].message.content)</code></pre>
+  {% include "copy_button.dtl" %}
+</div>

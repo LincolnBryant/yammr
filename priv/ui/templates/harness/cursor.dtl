@@ -1,0 +1,11 @@
+{# Connect card panel for Cursor. Included by connect.dtl; see harness/curl.dtl. #}
+<ol class="steps">
+  <li>Settings → Models → paste your token under OpenAI API Key.</li>
+  <li>Enable "Override OpenAI Base URL" and add the model id below.</li>
+</ol>
+<div class="codeblock">
+<pre><code>Base URL:  {{ base_url }}
+API key:   <mark>yk_...</mark>
+Model id:  {{ model }}</code></pre>
+  {% include "copy_button.dtl" %}
+</div>

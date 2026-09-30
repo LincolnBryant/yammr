@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · yammr</title>
+  <link rel="stylesheet" href="/ui/fonts/fonts.css">
+  <link rel="stylesheet" href="/ui/style.css">
+  <script src="/ui/theme.js"></script>
+</head>
+<body class="login-page">
+  <main class="login">
+    <div class="card">
+      <button class="theme-toggle corner" type="button" data-theme-toggle aria-label="Switch light/dark theme" title="Switch theme">
+        <svg class="icon i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg><svg class="icon i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+      <div class="brand">
+        <span class="name">yammr</span><span class="sub">Yet Another Multiplexing Model Relay</span>
+      </div>
+
+      <h1>Sign in</h1>
+      <p class="muted">Use your organization account to mint an API token and see your usage.</p>
+
+      {% if expired %}
+        <div class="notice" role="status">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          Your session expired. Please sign in again.
+        </div>
+      {% elif error %}
+        <div class="notice" role="status">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          Sign-in didn't complete. Please try again.
+        </div>
+      {% endif %}
+
+      <a class="btn primary block idp" href="/yammr/auth/login">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+        Continue with single sign-on
+      </a>
+
+      <p class="foot">OpenAI-compatible <span class="dot">·</span> <span class="mono">v{{ version }}</span></p>
+    </div>
+  </main>
+</body>
+</html>

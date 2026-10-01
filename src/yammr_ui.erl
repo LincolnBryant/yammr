@@ -65,7 +65,8 @@ signed_out(Req) ->
 handle(dashboard, <<"GET">>, User, Req) ->
     Vars = lists:foldl(fun maps:merge/2, page(dashboard, User), [
         token_vars(User),
-        connect_vars(<<"curl">>, Req)
+        connect_vars(<<"curl">>, Req),
+        #{usage => usage(User)}
     ]),
     render(dashboard_dtl, Vars, Req);
 handle(system, <<"GET">>, User, Req) ->

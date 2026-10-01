@@ -8,29 +8,20 @@
   </div>
 </div>
 
+  {# Token card (an htmx fragment) beside the usage summary. Grid cells stretch
+     to equal height; the sibling-margin rule is suppressed inside grids. #}
 <div class="grid grid-2">
-  <section id="account" class="card">
-    <div class="card-header">
-      <h2><svg class="icon"><use href="#i-user"/></svg>Account</h2>
-    </div>
-    <div class="identity">
-      <div class="avatar lg"><svg class="icon"><use href="#i-user"/></svg></div>
-      <div class="who">
-        <div class="name">{{ user.name }}</div>
-        <div class="email" title="{{ user.email }}">{{ user.email }}</div>
-      </div>
-    </div>
-    <p class="small faint">Signed in with your organization's single sign-on. Requests made with your API token are attributed to this account. Log out from the sidebar.</p>
-  </section>
-
   {# The token card is a fragment; its buttons re-render it in place. #}
   {% include "token_panel.dtl" %}
+
+  {# Usage summary; values are mocked until metering lands. #}
+  {% include "usage_panel.dtl" %}
 </div>
 
 <section id="connect" class="card">
   <div class="card-header">
     <h2><svg class="icon"><use href="#i-link"/></svg>Connect</h2>
-    <span class="small faint">Base URL <code>{{ base_url }}</code></span>
+    <span class="small muted">Base URL <code>{{ base_url }}</code></span>
   </div>
   {% include "connect.dtl" %}
 </section>

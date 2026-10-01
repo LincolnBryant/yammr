@@ -14,16 +14,16 @@
     <div class="secret">
       <code>{{ secret }}</code>
       <button class="btn sm" type="button" data-copy="{{ secret }}"
-              hx-on:click="navigator.clipboard.writeText(this.dataset.copy); this.classList.add('done')">
+              hx-on:click="const b = this; navigator.clipboard.writeText(this.dataset.copy).then(() => { b.classList.remove('done'); void b.offsetWidth; b.classList.add('done'); })">
         <svg class="icon"><use href="#i-copy"/></svg><span class="copy-label">Copy</span>
       </button>
     </div>
-    <p class="small faint">Created {{ token.created }}</p>
+    <p class="small muted">Created {{ token.created }}</p>
   {% elif token %}
     <div class="secret">
       <code>{{ token.prefix }}<span class="mask">••••••••••••••••••••</span></code>
     </div>
-    <p class="small faint">Created {{ token.created }}. Send it as <code>Authorization: Bearer …</code> on <code>/v1</code> requests.</p>
+    <p class="small muted">Created {{ token.created }}. Send it as <code>Authorization: Bearer …</code> on <code>/v1</code> requests.</p>
   {% else %}
     <p class="muted">You don't have an API token yet. Mint one to start sending requests through the relay.</p>
   {% endif %}

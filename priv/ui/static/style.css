@@ -2,54 +2,68 @@
    Order: tokens → base → app shell → components → login → responsive. */
 
 :root {
-  /* MIT brand palette (brand.mit.edu/color). Each token is light-dark(light, dark); which side
-     applies is decided by `color-scheme` below: the OS preference by default, or the user's
+  /* MIT brand palette (brand.mit.edu/color) for light mode; a custom electric
+     palette for dark. Each token is light-dark(light, dark); which side applies
+     is decided by `color-scheme` below: the OS preference by default, or the user's
      choice via data-theme (set by theme.js). Every text/background pair is >= 4.5:1.
      Light: core palette. MIT Red accent on white cards, Yellow highlight (the guide pairs MIT Red
      with analogous warm colours). Bright Red and Green are < 4.5:1 on white, so in light mode they
      are tints only, never text.
-     Dark: expanded palette, cool side. Light Purple for text accents and (inverted) fills,
-     Light Blue for focus and decoration; no reds. Surfaces are the gray ramp only: Dark Gray 2
-     canvas, cards a step lighter. Pure black is not used. Status colours are the brand Green /
-     Yellow knocked back toward Light Gray 1 so they don't glare; destructive stays a muted red. */
+     Dark: near-black indigo canvas, one electric cyan accent, vivid violet reserved
+     for decoration (login backdrop). Secondary text stays bright so small sizes never
+     go muddy; selected states invert to solid cyan instead of tinting. Status colours go
+     neon (mint / amber / hot coral) so they read at a glance on dark. */
   color-scheme: light dark;
-  --bg: light-dark(#f2f4f8, #212326);                 /* Light Gray 1 | Dark Gray 2 */
-  --surface: light-dark(#ffffff, color-mix(in srgb, #40464c 35%, #212326));      /* white | ~#2c2f33 */
-  --surface-2: light-dark(#f2f4f8, color-mix(in srgb, #40464c 75%, #212326));    /* Light Gray 1 | ~#383d42 */
-  --border: light-dark(#dde1e6, #626a73);             /* Light Gray 2 | Dark Silver Gray */
-  --border-strong: light-dark(#b8c2cc, #8b959e);      /* Light Silver Gray | Silver Gray */
-  --text: light-dark(#212326, #dde1e6);               /* Dark Gray 2 | Light Gray 2 */
-  --text-2: light-dark(#40464c, #b8c2cc);             /* Dark Gray 1 | Light Silver Gray */
-  --text-3: light-dark(#626a73, color-mix(in srgb, #b8c2cc 50%, #8b959e));      /* Dark Silver Gray | between the Silver Grays */
-  /* --accent is for text, icons and outlines; --accent-fill for solid backgrounds (primary button). */
-  --accent: light-dark(#750014, #bfb3ff);             /* MIT Red | Light Purple (7.1:1 on cards) */
-  /* Dark fills are the *light* purple with dark text (8.3:1): an inverted button reads calmer on a
-     dark canvas than a saturated Dark Purple slab. */
-  --accent-fill: light-dark(#750014, #bfb3ff);        /* MIT Red | Light Purple */
-  --on-accent: light-dark(#ffffff, #212326);          /* white | Dark Gray 2 */
-  --accent-2: light-dark(#ff1423, #99ebff);           /* decorative only (login gradient): Bright Red | Light Blue */
-  --accent-soft: light-dark(color-mix(in srgb, #750014 9%, #ffffff), color-mix(in srgb, #bfb3ff 16%, var(--surface)));
-  --focus: light-dark(#1966ff, #99ebff);              /* Blue | Light Blue */
+  --bg: light-dark(#f2f4f8, #070917);                 /* Light Gray 1 | near-black indigo */
+  --surface: light-dark(#ffffff, #0e1128);            /* white | deep indigo panel */
+  --surface-2: light-dark(#f2f4f8, #1a1f4b);          /* Light Gray 1 | lifted indigo */
+  --border: light-dark(#dde1e6, #2b3160);             /* Light Gray 2 | indigo edge */
+  --border-strong: light-dark(#b8c2cc, #4c5494);      /* Light Silver Gray | violet edge */
+  --text: light-dark(#212326, #f2f4ff);               /* Dark Gray 2 | ice white */
+  --text-2: light-dark(#40464c, #c9cfee);             /* Dark Gray 1 | bright periwinkle */
+  --text-3: light-dark(#626a73, #a3a9d6);             /* Dark Silver Gray | clear violet-gray */
+  /* --accent is for text, icons and outlines; --accent-fill for solid backgrounds (primary button).
+     Dark has one accent only: electric cyan. No lavender anywhere. */
+  --accent: light-dark(#750014, #3fe0ff);             /* MIT Red | electric cyan (~9:1 on panels) */
+  /* Dark primary buttons are solid cyan with near-black text (~10:1): loud on purpose. */
+  --accent-fill: light-dark(#750014, #3fe0ff);        /* MIT Red | electric cyan */
+  --on-accent: light-dark(#ffffff, #060814);          /* white | near-black */
+  --accent-2: light-dark(#ff1423, #8b5cf6);           /* decorative only (login gradient): Bright Red | vivid violet */
+  --accent-soft: light-dark(color-mix(in srgb, #750014 9%, #ffffff), color-mix(in srgb, #c4b3ff 34%, #14173a));
+  /* Selected states stay quiet in dark: a lifted fill with body-weight semibold
+     text. Light keeps the soft wash + red text it always had. Cyan stays reserved
+     for content that earns attention (stats, primary actions, highlights). */
+  --active-bg: light-dark(var(--accent-soft), var(--surface-2));
+  --active-fg: light-dark(var(--accent), var(--text));
+  /* Identity tiles match the selected-state treatment, not the accent. */
+  --avatar-bg: light-dark(var(--accent-soft), var(--surface-2));
+  --avatar-fg: light-dark(var(--accent), var(--text-2));
+  /* Card icons track the quiet text in dark — cyan everywhere pulled focus away from the numbers. */
+  --icon: light-dark(var(--emphasis), var(--text-3));
+  --focus: light-dark(#1966ff, #3fe0ff);              /* Blue | electric cyan */
   /* Dark mode gets a second, non-interactive accent so the page has somewhere for the eye to land:
-     stat values and card icons. Light mode keeps a single accent (MIT Red) for both roles. */
-  --emphasis: light-dark(#750014, #99ebff);           /* MIT Red | Light Blue (10:1 on cards) */
-  --ok: light-dark(#004d1a, color-mix(in srgb, #00ad00 70%, #f2f4f8));       /* Dark Green | muted Green */
-  --ok-soft: light-dark(color-mix(in srgb, #00ad00 14%, #ffffff), color-mix(in srgb, #00ad00 14%, var(--surface)));
-  --warn: light-dark(#40464c, color-mix(in srgb, #ffeb00 60%, #f2f4f8));     /* Dark Gray 1 on a Yellow tint | muted Yellow */
-  --warn-soft: light-dark(color-mix(in srgb, #ffeb00 40%, #ffffff), color-mix(in srgb, #ffeb00 12%, var(--surface)));
-  --bad: light-dark(#750014, color-mix(in srgb, #ff1423 55%, #f2f4f8));      /* MIT Red | muted red, destructive actions only */
-  --bad-soft: light-dark(color-mix(in srgb, #ff1423 10%, #ffffff), color-mix(in srgb, #ff1423 16%, var(--surface)));
-  /* Terminal blocks follow the theme: a light terminal in light mode, a recessed one in dark. */
-  --code-bg: light-dark(#f2f4f8, #212326);            /* Light Gray 1 | Dark Gray 2 */
-  --code-fg: light-dark(#212326, #dde1e6);            /* Dark Gray 2 | Light Gray 2 (14:1 / 12:1) */
-  --code-border: light-dark(#dde1e6, transparent);    /* Light Gray 2 | none (the recess is enough) */
+     stat values glow cyan. Light mode keeps a single accent (MIT Red) for both roles. */
+  --emphasis: light-dark(#750014, #3fe0ff);           /* MIT Red | electric cyan (~9:1 on panels) */
+  --ok: light-dark(#004d1a, #2fe6a8);                 /* Dark Green | electric mint */
+  --ok-soft: light-dark(color-mix(in srgb, #00ad00 14%, #ffffff), color-mix(in srgb, #2fe6a8 16%, var(--surface)));
+  --warn: light-dark(#40464c, #ffd166);               /* Dark Gray 1 on a Yellow tint | neon amber */
+  --warn-soft: light-dark(color-mix(in srgb, #ffeb00 40%, #ffffff), color-mix(in srgb, #ffd166 14%, var(--surface)));
+  --bad: light-dark(#750014, #ff5d7e);                /* MIT Red | hot coral, destructive actions only */
+  --bad-soft: light-dark(color-mix(in srgb, #ff1423 10%, #ffffff), color-mix(in srgb, #ff5d7e 18%, var(--surface)));
+  /* Terminal blocks follow the theme: a light terminal in light mode, a near-black one in dark. */
+  --code-bg: light-dark(#f2f4f8, #05060f);            /* Light Gray 1 | black terminal */
+  --code-fg: light-dark(#212326, #e6e9ff);            /* Dark Gray 2 | ice blue (14:1 / 13:1) */
+  --code-border: light-dark(#dde1e6, #232a55);        /* Light Gray 2 | electric edge */
   /* "Replace me" marks in snippets. Light: the same pale Bright Red tint as the danger button with
-     MIT Red text (~9:1). Dark: Light Blue with Dark Gray 2 text (10:1) — the same emphasis colour as
+     MIT Red text (~9:1). Dark: electric cyan on near-black (~10:1) — the same emphasis colour as
      the stat numbers and card icons, so dark stays at two accents. */
-  --highlight-bg: light-dark(color-mix(in srgb, #ff1423 18%, #ffffff), #99ebff);
-  --highlight-fg: light-dark(#750014, #212326);
-  --shadow-1: light-dark(rgba(33, 35, 38, 0.04), rgba(33, 35, 38, 0.4));
-  --shadow-2: light-dark(rgba(33, 35, 38, 0.18), rgba(33, 35, 38, 0.7));
+  --highlight-bg: light-dark(color-mix(in srgb, #ff1423 18%, #ffffff), #3fe0ff);
+  --highlight-fg: light-dark(#750014, #05060f);
+  --shadow-1: light-dark(rgba(33, 35, 38, 0.04), rgba(2, 3, 12, 0.55));
+  --shadow-2: light-dark(rgba(33, 35, 38, 0.18), rgba(2, 3, 12, 0.8));
+  /* Neon lift, dark only (none in light so the MIT look stays flat and crisp). */
+  --glow-btn: light-dark(none, 0 0 20px -6px color-mix(in srgb, var(--accent-fill) 65%, transparent));
+  --glow-code: light-dark(none, inset 0 0 28px rgba(63, 224, 255, 0.07));
   --shadow: 0 1px 2px var(--shadow-1), 0 8px 24px -16px var(--shadow-2);
   --sidebar-w: 240px;
   --radius: 12px;
@@ -76,14 +90,14 @@ a:hover { text-decoration: underline; }
 h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.015em; }
 h1 { font-size: 22px; }
 h2 { font-size: 15px; display: flex; align-items: center; gap: 8px; }
-h2 .icon { color: var(--emphasis); }
+h2 .icon { color: var(--icon); }
 p { margin: 0; }
 code, pre, .mono { font-family: var(--mono); font-size: 12.5px; }
 code { padding: 1px 5px; border-radius: 5px; background: var(--surface-2); border: 1px solid var(--border); }
 .num { font-variant-numeric: tabular-nums; }
 .muted { color: var(--text-2); }
 .faint { color: var(--text-3); }
-.small { font-size: 12px; }
+.small { font-size: 12.5px; }
 .dot { color: var(--text-3); padding: 0 4px; }
 
 /* Placeholders the reader must replace (their token). */
@@ -121,7 +135,7 @@ mark {
   color: var(--text-2); font-weight: 500;
 }
 .nav a:hover { background: var(--surface-2); color: var(--text); text-decoration: none; }
-.nav a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+.nav a[aria-current="page"] { background: var(--active-bg); color: var(--active-fg); font-weight: 600; }
 .nav .icon { width: 15px; height: 15px; opacity: 0.9; }
 
 .sidebar-footer { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
@@ -167,7 +181,7 @@ mark {
 /* Stat card */
 .stat .card-header { margin-bottom: 8px; }
 .stat .card-header h2 { font-size: 13px; font-weight: 500; color: var(--text-2); }
-/* Light keeps the numbers in body colour (MIT Red digits would shout); dark gives them the Light Blue pop. */
+/* Light keeps the numbers in body colour (MIT Red digits would shout); dark gives them the electric cyan pop. */
 .stat .value { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; color: light-dark(var(--text), var(--emphasis)); }
 .stat .value .of { font-size: 15px; font-weight: 500; color: var(--text-3); margin-left: 6px; letter-spacing: 0; }
 .stat .delta { font-size: 12px; margin-top: 8px; color: var(--text-3); }
@@ -176,7 +190,7 @@ mark {
 .identity { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .avatar {
   width: 32px; height: 32px; border-radius: 50%; flex: none; display: grid; place-items: center;
-  background: var(--accent-soft); color: var(--accent);
+  background: var(--avatar-bg); color: var(--avatar-fg);
 }
 .avatar .icon { width: 15px; height: 15px; }
 .avatar.lg { width: 44px; height: 44px; }
@@ -205,17 +219,22 @@ mark {
 .btn:hover { background: var(--surface-2); text-decoration: none; }
 .btn:disabled { opacity: 0.6; cursor: default; }
 .btn .icon { width: 14px; height: 14px; }
-.btn.primary { background: var(--accent-fill); border-color: var(--accent-fill); color: var(--on-accent); }
+.btn.primary { background: var(--accent-fill); border-color: var(--accent-fill); color: var(--on-accent); box-shadow: var(--glow-btn); }
 .btn.primary:hover { filter: brightness(1.06); }
 .btn.danger { color: var(--bad); border-color: transparent; background: var(--bad-soft); }
 .btn.danger:hover { filter: brightness(0.97); }
 .btn.sm { padding: 5px 9px; font-size: 12px; }
 .btn.block { width: 100%; padding: 10px; font-size: 14px; }
 
-/* Copy buttons flip to "Copied" purely via class toggle (see hx-on:click). */
+/* Copy buttons flip to "Copied" on first click; every successful click replays a
+   short confirm pulse, so repeats still acknowledge. The pulse restarts because the
+   handler drops .done, forces a reflow, and re-adds it (see hx-on:click). */
 .btn.done .copy-label { display: none; }
 .btn.done::after { content: "Copied"; }
-.btn.done { color: var(--ok); }
+.btn.done { color: var(--ok); animation: confirm 650ms ease-out; }
+@keyframes confirm {
+  0% { background-color: var(--ok-soft); border-color: var(--ok); }
+}
 
 /* htmx request state: hide the spinner until a request is in flight. */
 .htmx-indicator { display: none; }
@@ -268,7 +287,7 @@ td .icon { width: 13px; height: 13px; vertical-align: -2px; }
 .codeblock pre {
   margin: 0; padding: 14px 16px; overflow-x: auto; border-radius: var(--radius-sm);
   background: var(--code-bg); color: var(--code-fg); line-height: 1.55;
-  border: 1px solid var(--code-border);
+  border: 1px solid var(--code-border); box-shadow: var(--glow-code);
 }
 .codeblock code { background: none; border: 0; padding: 0; color: inherit; font-size: 12.5px; }
 .codeblock mark { font-size: inherit; }

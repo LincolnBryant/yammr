@@ -24,7 +24,8 @@ start_link() ->
 
 -spec put(map()) -> {ok, binary()}.
 put(Map) ->
-    put(Map, ?TTL_MS).
+	% need to call it by its local name because we collide with the built-in put/2
+    ?MODULE:put(Map, ?TTL_MS).
 
 -spec put(map(), pos_integer()) -> {ok, binary()}.
 put(Map, TtlMs) ->

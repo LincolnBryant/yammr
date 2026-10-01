@@ -45,7 +45,7 @@ init([ConfigPath]) ->
             start => {yammr_oauth_sup, start_link, []},
             type => supervisor
         },
-        %% API tokens minted from the dashboard (in-memory for now)
+        %% API tokens minted from the dashboard (DETS-backed, ETS-cached)
         #{
             id => yammr_tokens,
             start => {yammr_tokens, start_link, []}

@@ -42,7 +42,7 @@ proxy(Req0, #{up_host := UpHost, up_port := UpPort, up_token := UpToken} = State
         {ok, _Proto} ?= gun:await_up(ConnPid),
         MRef = monitor(process, ConnPid),
         % Check validity of the key
-        ok ?= valid_token(Req0),
+        {ok, _User} ?= valid_token(Req0),
         {StreamRef, Req1} = relay(UpToken, ConnPid, Req0),
         {response, IsFin, Status, Headers} ?= gun:await(ConnPid, StreamRef, MRef),
         case is_sse(Headers) of

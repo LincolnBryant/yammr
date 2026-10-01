@@ -41,6 +41,8 @@ proxy(Req0, #{up_host := UpHost, up_port := UpPort, up_token := UpToken} = State
     maybe
         {ok, _Proto} ?= gun:await_up(ConnPid),
         MRef = monitor(process, ConnPid),
+        % Check validity of the key
+        ok ?= valid_token(Req0),
         {StreamRef, Req1} = relay(UpToken, ConnPid, Req0),
         {response, IsFin, Status, Headers} ?= gun:await(ConnPid, StreamRef, MRef),
         case is_sse(Headers) of
@@ -61,6 +63,17 @@ proxy(Req0, #{up_host := UpHost, up_port := UpPort, up_token := UpToken} = State
                         }
                 },
             Req2 = yammr_util:reply_json(timeout, Message, Req0),
+            {ok, Req2, State};
+        {error, invalid_token} ->
+            Message =
+                #{
+                    error =>
+                        #{
+                            message => <<"Invalid token">>,
+                            type => <<"Unauthorized">>
+                        }
+                },
+            Req2 = yammr_util:reply_json(unauthorized, Message, Req0),
             {ok, Req2, State};
         % Failed to bring the connection up
         {error, Reason} ->
@@ -180,3 +193,12 @@ arm_timer(State) ->
 disarm_timer(#{idle_timer := TRef} = State) ->
     erlang:cancel_timer(TRef),
     State.
+
+valid_token(Req0) ->
+    case cowboy_req:parse_header(<<"authorization">>, Req0, {error, invalid_token}) of
+        % Guard to make eqWalizer happy..
+        {bearer, Token} when is_binary(Token) ->
+            yammr_tokens:verify(Token);
+        _ ->
+            {error, invalid_token}
+    end.

@@ -7,6 +7,10 @@
 -define(SIGNED_IN_PATH, <<"/dashboard">>).
 -define(SIGNED_OUT_PATH, <<"/">>).
 -define(SIGNIN_FAILED_PATH, <<"/?error=1">>).
+%% Fresh login entry point. A dead handshake is always recoverable by
+%% starting over, so does_not_exist/expired redirect here instead of
+%% showing the error page.
+-define(LOGIN_PATH, <<"/yammr/auth/login">>).
 
 init(Req, #{action := login} = Opts) -> login(Req, Opts);
 init(Req, #{action := callback} = Opts) -> callback(Req, Opts);
@@ -87,23 +91,27 @@ callback(Req0, Opts) ->
         Claims = yammr_oidcc:id_claims(Token),
         logger:info("Sign-in complete for ~s", [maps:get(<<"email">>, Claims, <<"?">>)]),
         Req1 = yammr_session:start(Claims, Req0),
-        {ok, redirect(?SIGNED_IN_PATH, Req1), Opts}
+        Req2 = clear_handshake_cookie(Req1),
+        {ok, redirect(?SIGNED_IN_PATH, Req2), Opts}
     else
         {error, does_not_exist} ->
-            logger:notice("Stashed state retrieval failed: requested entry does not exist in ETS"),
-            {ok, redirect(?SIGNIN_FAILED_PATH, Req0), Opts};
+            logger:notice("Stale handshake presented; restarting login flow"),
+            {ok, redirect(?LOGIN_PATH, clear_handshake_cookie(Req0)), Opts};
+        {error, expired} ->
+            logger:notice("Expired handshake presented; restarting login flow"),
+            {ok, redirect(?LOGIN_PATH, clear_handshake_cookie(Req0)), Opts};
         {error, OtherError} ->
             logger:notice("Token exchange failed: ~p", [OtherError]),
-            {ok, redirect(?SIGNIN_FAILED_PATH, Req0), Opts};
+            {ok, redirect(?SIGNIN_FAILED_PATH, clear_handshake_cookie(Req0)), Opts};
         #{<<"error">> := Err} ->
             logger:notice("Bad reply from Okta: ~p", [Err]),
-            {ok, redirect(?SIGNIN_FAILED_PATH, Req0), Opts};
+            {ok, redirect(?SIGNIN_FAILED_PATH, clear_handshake_cookie(Req0)), Opts};
         #{<<"state">> := BadState} ->
             logger:notice("State did not match: ~p)", [BadState]),
-            {ok, redirect(?SIGNIN_FAILED_PATH, Req0), Opts};
+            {ok, redirect(?SIGNIN_FAILED_PATH, clear_handshake_cookie(Req0)), Opts};
         Err ->
             logger:notice("Missing some other state/code: ~p", [Err]),
-            {ok, redirect(?SIGNIN_FAILED_PATH, Req0), Opts}
+            {ok, redirect(?SIGNIN_FAILED_PATH, clear_handshake_cookie(Req0)), Opts}
     end.
 
 logout(Req0, Opts) ->
@@ -113,3 +121,15 @@ logout(Req0, Opts) ->
 %% Browser flow: every auth endpoint ends in a redirect back into the UI.
 redirect(Location, Req) ->
     cowboy_req:reply(302, #{<<"location">> => Location}, Req).
+
+%% The handshake is one-shot server-side (take/1 deletes the entry), so
+%% expire it client-side on every callback exit. Otherwise each completed
+%% login leaves a dead cookie that fails the same way on any replay.
+clear_handshake_cookie(Req) ->
+    cowboy_req:set_resp_cookie(<<"yammr_auth">>, <<>>, Req, #{
+        http_only => true,
+        secure => false,
+        same_site => lax,
+        max_age => 0,
+        path => <<"/yammr/auth">>
+    }).

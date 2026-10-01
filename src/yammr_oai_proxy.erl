@@ -93,7 +93,6 @@ proxy(Req0, #{up_host := UpHost, up_port := UpPort, up_token := UpToken} = State
 relay(UpToken, ConnPid, Req0) ->
     TokenBin = list_to_binary(UpToken),
     Headers0 = cowboy_req:headers(Req0),
-    logger:notice("Headers: ~p", [Headers0]),
     Headers1 = Headers0#{<<"authorization">> => <<"Bearer ", TokenBin/binary>>},
     Path = cowboy_req:path(Req0),
     Method = cowboy_req:method(Req0),

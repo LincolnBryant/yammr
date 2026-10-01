@@ -10,10 +10,10 @@
 -define(SSE_TIMEOUT, 30_000).
 -define(BODY_TIMEOUT, 30_000).
 
-allowed(~"GET", ~"/v1/models") -> true;
-allowed(~"POST", ~"/v1/chat/completions") -> true;
-allowed(~"POST", ~"/v1/completions") -> true;
-allowed(~"POST", ~"/v1/embeddings") -> true;
+allowed(<<"GET">>, <<"/v1/models">>) -> true;
+allowed(<<"POST">>, <<"/v1/chat/completions">>) -> true;
+allowed(<<"POST">>, <<"/v1/completions">>) -> true;
+allowed(<<"POST">>, <<"/v1/embeddings">>) -> true;
 allowed(_, _) -> false.
 
 init(Req0, State) ->
@@ -23,8 +23,8 @@ init(Req0, State) ->
         false ->
             Req = cowboy_req:reply(
                 403,
-                #{~"content-type" => ~"application/json"},
-                ~"{\"error\":{\"message\":\"forbidden\",\"type\":\"invalid_request_error\"}}",
+                #{<<"content-type">> => <<"application/json">>},
+                <<"{\"error\":{\"message\":\"forbidden\",\"type\":\"invalid_request_error\"}}">>,
                 Req0
             ),
             {ok, Req, State}
@@ -41,6 +41,8 @@ proxy(Req0, #{up_host := UpHost, up_port := UpPort, up_token := UpToken} = State
     maybe
         {ok, _Proto} ?= gun:await_up(ConnPid),
         MRef = monitor(process, ConnPid),
+        % Check validity of the key
+        {ok, _User} ?= valid_token(Req0),
         {StreamRef, Req1} = relay(UpToken, ConnPid, Req0),
         {response, IsFin, Status, Headers} ?= gun:await(ConnPid, StreamRef, MRef),
         case is_sse(Headers) of
@@ -61,6 +63,17 @@ proxy(Req0, #{up_host := UpHost, up_port := UpPort, up_token := UpToken} = State
                         }
                 },
             Req2 = yammr_util:reply_json(timeout, Message, Req0),
+            {ok, Req2, State};
+        {error, invalid_token} ->
+            Message =
+                #{
+                    error =>
+                        #{
+                            message => <<"Invalid token">>,
+                            type => <<"Unauthorized">>
+                        }
+                },
+            Req2 = yammr_util:reply_json(unauthorized, Message, Req0),
             {ok, Req2, State};
         % Failed to bring the connection up
         {error, Reason} ->
@@ -85,10 +98,10 @@ relay(UpToken, ConnPid, Req0) ->
     Path = cowboy_req:path(Req0),
     Method = cowboy_req:method(Req0),
     case Method of
-        ~"GET" ->
+        <<"GET">> ->
             StreamRef = gun:get(ConnPid, Path, Headers1),
             {StreamRef, Req0};
-        ~"POST" ->
+        <<"POST">> ->
             % Might have an issue above 8MB
             {ok, Body, Req1} = cowboy_req:read_body(Req0),
             StreamRef = gun:post(ConnPid, Path, Headers1, Body),
@@ -135,8 +148,8 @@ reply_stream(Status, ConnPid, MRef, StreamRef, Req1, State) ->
     Req2 = cowboy_req:stream_reply(
         Status,
         #{
-            ~"content-type" => ~"text/event-stream",
-            ~"cache-control" => ~"no-cache"
+            <<"content-type">> => <<"text/event-stream">>,
+            <<"cache-control">> => <<"no-cache">>
         },
         Req1
     ),
@@ -165,10 +178,10 @@ reply_buffered(Headers, IsFin, Status, ConnPid, MRef, StreamRef, Req1, State) ->
 sanitize_response_headers(HeaderMap) ->
     maps:without(
         [
-            ~"connection",
-            ~"transfer-encoding",
-            ~"keep-alive",
-            ~"content-length"
+            <<"connection">>,
+            <<"transfer-encoding">>,
+            <<"keep-alive">>,
+            <<"content-length">>
         ],
         HeaderMap
     ).
@@ -180,3 +193,12 @@ arm_timer(State) ->
 disarm_timer(#{idle_timer := TRef} = State) ->
     erlang:cancel_timer(TRef),
     State.
+
+valid_token(Req0) ->
+    case cowboy_req:parse_header(<<"authorization">>, Req0, {error, invalid_token}) of
+        % Guard to make eqWalizer happy..
+        {bearer, Token} when is_binary(Token) ->
+            yammr_tokens:verify(Token);
+        _ ->
+            {error, invalid_token}
+    end.

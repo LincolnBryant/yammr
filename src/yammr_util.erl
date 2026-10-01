@@ -14,4 +14,8 @@ reply_json(bad_gateway, Msg, Req) ->
 reply_json(timeout, Msg, Req) ->
     Headers = #{<<"content-type">> => <<"application/json">>},
     Body = json:encode(Msg),
-    cowboy_req:reply(504, Headers, Body, Req).
+    cowboy_req:reply(504, Headers, Body, Req);
+reply_json(unauthorized, Msg, Req) ->
+    Headers = #{<<"content-type">> => <<"application/json">>},
+    Body = json:encode(Msg),
+    cowboy_req:reply(401, Headers, Body, Req).

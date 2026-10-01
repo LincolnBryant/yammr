@@ -1,5 +1,6 @@
 [server]
 port = 4434
+db_path = "/var/lib/yammr/users.dets"
 
 [upstream]
 # Your SGLang, vLLM, Ollama, etc

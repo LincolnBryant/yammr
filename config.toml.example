@@ -1,6 +1,11 @@
 [server]
 port = 4434
-db_path = "/var/lib/yammr/users.dets"
+db_path = "/var/lib/yammr/user_tokens.dets"
+# TLS is optional but all-or-nothing: set cert_path, key_path, and tls_port
+# together to add a TLS listener 
+# cert_path = "/etc/yammr/fullchain.pem"
+# key_path = "/etc/yammr/privkey.pem"
+# tls_port = 4435
 
 [upstream]
 # Your SGLang, vLLM, Ollama, etc

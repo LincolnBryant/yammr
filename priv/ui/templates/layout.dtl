@@ -44,7 +44,7 @@
 
     <nav class="nav" aria-label="Pages">
       <a href="/dashboard" {% if active == "dashboard" %}aria-current="page"{% endif %}><svg class="icon"><use href="#i-grid"/></svg>Dashboard</a>
-      <a href="/system" {% if active == "system" %}aria-current="page"{% endif %}><svg class="icon"><use href="#i-server"/></svg>System</a>
+      {# System page hidden until metering is real (route still live in yammr_ui). #}
     </nav>
 
     <div class="sidebar-footer">

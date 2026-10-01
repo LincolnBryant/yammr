@@ -14,8 +14,10 @@
   {# The token card is a fragment; its buttons re-render it in place. #}
   {% include "token_panel.dtl" %}
 
-  {# Usage summary; values are mocked until metering lands. #}
-  {% include "usage_panel.dtl" %}
+  {# Usage summary lives here once metering lands (see usage_panel.dtl).
+     Until then an empty cell holds the grid shape so the token card keeps
+     its half-width. #}
+<div aria-hidden="true"></div>
 </div>
 
 <section id="connect" class="card">

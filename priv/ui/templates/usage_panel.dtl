@@ -1,0 +1,11 @@
+{# Fragment: per-user usage summary on the dashboard. Values come from
+   usage/1 in yammr_ui (mocked until metering lands); replace the data
+   source when the relay starts reporting token counts. #}
+<section id="usage" class="card stat">
+  <div class="card-header">
+    <h2><svg class="icon"><use href="#i-activity"/></svg>Tokens Used</h2>
+    <span class="badge off" title="Not yet wired to the relay">mock</span>
+  </div>
+  <div class="value num">{{ usage.tokens }}</div>
+  <div class="delta">{{ usage.period }} · attributed to your API token</div>
+</section>

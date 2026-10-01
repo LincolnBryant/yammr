@@ -12,9 +12,11 @@ start(_StartType, _StartArgs) ->
     % Configure
     % Compile the routes into a opaque dispatch rules
     Dispatch = cowboy_router:compile([{'_', proxy_config() ++ oidc_config() ++ yammr_ui:routes()}]),
-    {ok, _Pid} = cowboy:start_clear(yammr_proxy, [{port, YammrPort}], #{
+    {ok, Pid} = cowboy:start_clear(yammr_proxy, [{port, YammrPort}], #{
         env => #{dispatch => Dispatch}
-    }).
+    }),
+    ok = maybe_start_tls(Dispatch),
+    {ok, Pid}.
 
 stop(_State) ->
     ok.
@@ -45,4 +47,38 @@ proxy_config() ->
             up_port => UpPort,
             up_token => binary_to_list(UpToken)
         }}
+    ].
+
+%% TLS listener is opt-in: only when both [server] cert and key are set.
+%% Missing (or half-set) keys mean plain HTTP only, same as before.
+maybe_start_tls(Dispatch) ->
+    maybe
+        {ok, Cert} ?= yammr_config:get([server, cert_path]),
+        {ok, Key} ?= yammr_config:get([server, key_path]),
+        {ok, Port} ?= yammr_config:get([server, tls_port]),
+        TLSOpts = [
+            {port, Port},
+            {certfile, binary_to_list(Cert)},
+            {keyfile, binary_to_list(Key)},
+            {versions, ['tlsv1.2', 'tlsv1.3']}
+        ],
+        %% If the user asks for TLS, and we fail to start it then crash
+        {ok, _} = cowboy:start_tls(yammr_proxy_tls, TLSOpts, #{
+            env => #{dispatch => Dispatch}
+        }),
+        ok
+    else
+        {error, not_found} ->
+            logger:warning(
+                "yammr: TLS listener disabled, missing [server] keys: ~p; serving plain HTTP only",
+                [missing_tls_keys()]
+            ),
+            ok
+    end.
+
+%% Which of the all-or-nothing TLS keys are unset (for the boot log).
+missing_tls_keys() ->
+    [
+        K
+     || K <- [cert_path, key_path, tls_port], yammr_config:get([server, K]) =:= {error, not_found}
     ].

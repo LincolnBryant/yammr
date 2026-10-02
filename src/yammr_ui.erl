@@ -116,7 +116,7 @@ connect_vars(Active, Req) ->
     #{
         harness => Active,
         base_url => base_url(Req),
-        model => <<"llama-3.3-70b-instruct">>,
+        model => <<"qwen3.8-27b">>,
         tabs => [#{id => Id, label => Label} || {Id, Label} <- harnesses()]
     }.
 

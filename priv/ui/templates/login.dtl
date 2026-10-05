@@ -19,7 +19,7 @@
       </div>
 
       <h1>Sign in</h1>
-      <p class="muted">Use your organization account to mint an API token and see your usage.</p>
+      <p class="muted">Use your organization account to generate an API token and see your usage.</p>
 
       {% if expired %}
         <div class="notice" role="status">

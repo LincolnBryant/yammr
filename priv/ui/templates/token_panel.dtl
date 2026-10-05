@@ -25,7 +25,7 @@
     </div>
     <p class="small muted">Created {{ token.created }}. Send it as <code>Authorization: Bearer …</code> on <code>/v1</code> requests.</p>
   {% else %}
-    <p class="muted">You don't have an API token yet. Mint one to start sending requests through the relay.</p>
+    <p class="muted">You don't have an API token yet. Generate one to start sending requests through the relay.</p>
   {% endif %}
 
   <div class="actions">
@@ -41,7 +41,7 @@
       </button>
     {% else %}
       <button class="btn primary" hx-post="/dashboard/token" hx-disable="this">
-        <svg class="icon"><use href="#i-key"/></svg>Mint API token
+        <svg class="icon"><use href="#i-key"/></svg>Generate API token
         <svg class="icon htmx-indicator spin"><use href="#i-loader"/></svg>
       </button>
     {% endif %}

@@ -20,6 +20,6 @@
     {% elif harness == "codex" %}{% include "harness/codex.dtl" %}
     {% elif harness == "cursor" %}{% include "harness/cursor.dtl" %}
     {% endif %}
-    <p class="small faint">Replace <mark>yk_...</mark> with the token you minted above. Model ids are listed on the <a href="/system">System</a> page, or <code>GET {{ base_url }}/models</code>.</p>
+    <p class="small faint">Replace <mark>yk_...</mark> with the token you generated above. Model ids are listed on the <a href="/system">System</a> page, or <code>GET {{ base_url }}/models</code>.</p>
   </div>
 </div>

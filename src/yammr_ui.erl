@@ -74,9 +74,9 @@ handle(system, <<"GET">>, User, Req) ->
     render(system_dtl, Vars, Req);
 %% --- fragments -------------------------------------------------------------
 
-%% Token panel: POST mints (response shows the secret once), DELETE revokes.
+%% Token panel: POST generates (response shows the secret once), DELETE revokes.
 handle(token, <<"POST">>, #{email := Email} = User, Req) ->
-    {ok, Secret, _Info} = yammr_tokens:mint(Email),
+    {ok, Secret, _Info} = yammr_tokens:generate(Email),
     render(token_panel_dtl, (token_vars(User))#{secret => Secret}, Req);
 handle(token, <<"DELETE">>, #{email := Email} = User, Req) ->
     ok = yammr_tokens:revoke(Email),

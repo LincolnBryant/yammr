@@ -1,16 +1,16 @@
 -module(yammr_tokens).
 -behaviour(gen_server).
 
-%% API tokens minted from the dashboard, persisted in DETS and cached in ETS.
+%% API tokens generated from the dashboard, persisted in DETS and cached in ETS.
 %%
 %% All calls go through the gen_server (same pattern as yammr_auth_store).
 %% When the proxy hot path needs it, the ETS reads can move out of the
 %% mailbox by reading the public tables directly from the caller.
--export([start_link/0, mint/1, lookup/1, verify/1, revoke/1]).
+-export([start_link/0, generate/1, lookup/1, verify/1, revoke/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 -type user() :: binary().
-%% What the dashboard may show after minting: the fixed prefix, and when.
+%% What the dashboard may show after generation: the fixed prefix, and when.
 -type token_info() :: #{prefix := binary(), created := integer()}.
 
 -define(PREFIX, <<"yk_">>).
@@ -31,11 +31,11 @@
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
-%% Mint a fresh token for the user, replacing any existing one.
+%% Generate a fresh token for the user, replacing any existing one.
 %% Returns the plaintext secret; it is not retrievable afterwards.
--spec mint(user()) -> {ok, Secret :: binary(), token_info()}.
-mint(User) ->
-    gen_server:call(?MODULE, {mint, User}).
+-spec generate(user()) -> {ok, Secret :: binary(), token_info()}.
+generate(User) ->
+    gen_server:call(?MODULE, {generate, User}).
 
 %% Dashboard view: does this user have a token, and what is its prefix?
 -spec lookup(user()) -> {ok, token_info()} | none.
@@ -68,7 +68,7 @@ init([]) ->
     {ok, #state{dets = Dets, by_user = ByUser, by_hash = ByHash}}.
 
 handle_call(
-    {mint, User}, _From, State = #state{dets = Dets, by_user = ByUser, by_hash = ByHash}
+    {generate, User}, _From, State = #state{dets = Dets, by_user = ByUser, by_hash = ByHash}
 ) when is_binary(User) ->
     Secret = <<?PREFIX/binary, (yammr_util:rand_token())/binary>>,
     Hash = crypto:hash(sha256, Secret),

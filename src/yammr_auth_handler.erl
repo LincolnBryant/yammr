@@ -86,9 +86,13 @@ callback(Req0, Opts) ->
                 nonce => Nonce,
                 pkce_verifier => PkceVerifier
             }),
-        % TODO: Exchange complete, should be able to pull out the refresh token
-        % and access token and do something with them now. use this for minting the access token
+        % TEMP DEBUG: dump the entire token record to see what the IdP gives us.
+        % logged at `error' because sys.config pins logger_level to warning.
+        logger:error("FULL OIDCC TOKEN RECORD: ~p", [Token]),
         Claims = yammr_oidcc:id_claims(Token),
+        logger:error("ID CLAIMS KEYS: ~p", [lists:sort(maps:keys(Claims))]),
+        logger:error("GROUPS CLAIM: ~p", [maps:get(<<"groups">>, Claims, not_present)]),
+        logger:error("REFRESH TOKEN: ~p", [yammr_oidcc:refresh_token(Token)]),
         logger:info("Sign-in complete for ~s", [maps:get(<<"email">>, Claims, <<"?">>)]),
         Req1 = yammr_session:start(Claims, Req0),
         Req2 = clear_handshake_cookie(Req1),

@@ -37,7 +37,7 @@ proxy(Req0, #{up_host := UpHost, up_port := UpPort, up_token := UpToken} = State
         retry => 0
     }),
     % Replace any existing bearer token from the client with ours
-    % TODO: Authenticate minted token
+    % TODO: Authenticate presented token
     maybe
         {ok, _Proto} ?= gun:await_up(ConnPid),
         MRef = monitor(process, ConnPid),

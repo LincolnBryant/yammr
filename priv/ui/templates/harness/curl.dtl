@@ -1,7 +1,7 @@
 {# Connect card panel for curl. Included by connect.dtl; the id is listed in
    yammr_ui:harnesses/0. Snippet lines are flush-left: <pre> keeps whitespace. #}
 <ol class="steps">
-  <li>Mint an API token above and export it as YAMMR_API_KEY.</li>
+  <li>Generate an API token above and export it as YAMMR_API_KEY.</li>
   <li>List models, then send a chat completion. Add "stream": true for SSE.</li>
 </ol>
 <div class="codeblock">

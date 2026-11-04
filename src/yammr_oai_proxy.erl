@@ -93,7 +93,6 @@ proxy(Req0, #{up_host := UpHost, up_port := UpPort, up_token := UpToken} = State
 relay(UpToken, ConnPid, Req0) ->
     TokenBin = list_to_binary(UpToken),
     Headers0 = cowboy_req:headers(Req0),
-    logger:notice("Headers: ~p", [Headers0]),
     Headers1 = Headers0#{<<"authorization">> => <<"Bearer ", TokenBin/binary>>},
     Path = cowboy_req:path(Req0),
     Method = cowboy_req:method(Req0),
@@ -176,15 +175,25 @@ reply_buffered(Headers, IsFin, Status, ConnPid, MRef, StreamRef, Req1, State) ->
     {ok, Req2, State}.
 
 sanitize_response_headers(HeaderMap) ->
-    maps:without(
-        [
-            <<"connection">>,
-            <<"transfer-encoding">>,
-            <<"keep-alive">>,
-            <<"content-length">>
-        ],
-        HeaderMap
-    ).
+    Allowed = [
+        <<"content-type">>,
+        <<"content-encoding">>,
+        <<"openai-processing-ms">>,
+        <<"openai-organization">>,
+        <<"openai-version">>,
+        <<"x-request-id">>,
+        <<"x-ratelimit-limit-requests">>,
+        <<"x-ratelimit-limit-tokens">>,
+        <<"x-ratelimit-remaining-requests">>,
+        <<"x-ratelimit-remaining-tokens">>,
+        <<"x-ratelimit-reset-requests">>,
+        <<"x-ratelimit-reset-tokens">>,
+        <<"x-ratelimit-limit-project-tokens">>,
+        <<"x-ratelimit-remaining-project-tokens">>,
+        <<"x-ratelimit-reset-project-tokens">>,
+        <<"retry-after">>
+    ],
+    maps:filter(fun(K, _V) -> lists:member(K, Allowed) end, HeaderMap).
 
 arm_timer(State) ->
     TRef1 = erlang:send_after(?SSE_TIMEOUT, self(), sse_timeout),

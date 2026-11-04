@@ -6,7 +6,6 @@
 %% API
 -export([
     start_link/1,
-    reload/1,
     put/1,
     get/1
 ]).
@@ -24,9 +23,6 @@
 start_link(ConfigPath) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [ConfigPath], []).
 
-reload(ConfigPath) ->
-    gen_server:call(?MODULE, {reload, ConfigPath}).
-
 put(Data) ->
     gen_server:call(?MODULE, {put, Data}).
 
@@ -39,10 +35,6 @@ init([ConfigPath]) ->
     Config = load_and_parse(ConfigPath),
     {ok, Config}.
 
-handle_call({reload, ConfigPath}, _From, _Config0) ->
-    Config = load_and_parse(ConfigPath),
-    % TODO: Examine any state changes and restart things as needed.
-    {reply, {ok, loaded}, Config};
 handle_call({put, Data}, _From, Config0) ->
     Config1 = maps:merge(Config0, Data),
     {ok, Config2} = validate(Config1),
@@ -69,9 +61,8 @@ code_change(_OldVsn, State, _Extra) ->
 load_and_parse(ConfigPath) ->
     {ok, Config1} = tomerl:read_file(ConfigPath),
     {ok, Config2} = validate(Config1),
-    % TODO: The validation bits!
     Config2.
 
 validate(Config) ->
-    % TODO: Jesse stuff
+    % TODO: The validation bits!
     {ok, Config}.

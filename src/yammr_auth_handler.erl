@@ -45,10 +45,9 @@ login(Req0, Opts) ->
         {ok, Url} ->
             Req = cowboy_req:set_resp_cookie(<<"yammr_auth">>, HandshakeId, Req0, #{
                 http_only => true,
-                %% TODO: false for localhost dev, flag it in config
-                secure => false,
-                %% TODO: NOT strict - need to investigate
-                same_site => lax,
+				% Prob need to set these to false/lax for local development
+                secure => true,
+                same_site => strict,
                 max_age => 600,
                 path => <<"/yammr/auth">>
             }),
@@ -88,11 +87,7 @@ callback(Req0, Opts) ->
             }),
         % TEMP DEBUG: dump the entire token record to see what the IdP gives us.
         % logged at `error' because sys.config pins logger_level to warning.
-        logger:error("FULL OIDCC TOKEN RECORD: ~p", [Token]),
         Claims = yammr_oidcc:id_claims(Token),
-        logger:error("ID CLAIMS KEYS: ~p", [lists:sort(maps:keys(Claims))]),
-        logger:error("GROUPS CLAIM: ~p", [maps:get(<<"groups">>, Claims, not_present)]),
-        logger:error("REFRESH TOKEN: ~p", [yammr_oidcc:refresh_token(Token)]),
         logger:info("Sign-in complete for ~s", [maps:get(<<"email">>, Claims, <<"?">>)]),
         Req1 = yammr_session:start(Claims, Req0),
         Req2 = clear_handshake_cookie(Req1),
